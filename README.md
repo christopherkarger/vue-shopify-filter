@@ -1,19 +1,19 @@
 #Install Gulp\
-https://gulpjs.com/
+https://gulpjs.com/\
 
-#Install themekit
-https://shopify.github.io/themekit/
+#Install themekit\
+https://shopify.github.io/themekit/\
 
-#Adapt config 
-shop/config.yml
+#Adapt config\ 
+shop/config.yml\
 
-#run in terminal
-npm install
-gulp
-cd shop
-theme --watch
+#run in terminal\
+npm install\
+gulp\
+cd shop\
+theme --watch\
 
-# feel free to use or modify
+feel free to use or modify\
 
 #screenshots
 ![Alt text](screenshots/1.png?raw=true "Screenshot 1")
