@@ -1,0 +1,400 @@
+* {
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Standard syntax */
+}
+
+%dropdownicon {
+  content: '<';
+  display: block;
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 10;
+  transition: transform .3s ease;
+  transform-origin: 50% 50%;
+  transform: rotate(-90deg);
+}
+
+
+.main-wrapper {
+  margin-bottom: 20px;
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+
+.filter-wrapper {
+  margin-bottom: 30px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    cursor: pointer;
+    padding: 0;
+    &:last-child {
+      margin-bottom: 10px;
+    }
+
+    &:hover {
+      background: #f6f6f6;
+    }
+  }
+}
+
+label {
+  margin: 0;
+  cursor: pointer;
+  position: relative;
+  padding: 8px 13px 8px 47px;
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 7px;
+    left: 13px;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #000;
+  }
+
+  &:after {
+    content: '';
+    opacity: 0;
+    position: absolute;
+    width: 11px;
+    height: 5px;
+    top: 15px;
+    left: 20px;
+    border: 2px solid #000;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+    transition: opacity .1s ease-in-out;
+  } 
+  
+  .color & {
+    &:before {
+      border-radius: 50%;
+      border: 0;
+    }
+    &:after {
+      border-color: #fff;
+    }
+  }
+}
+
+input[type=checkbox] {
+  display: none;
+}
+
+input[type=checkbox]:checked + label {
+  &:after {
+    opacity: 1;
+  }
+}
+
+.only-sale {
+  padding-top: 10px;
+  label {
+    padding-left: 33px;
+    &:before {
+      left: 0;
+    }
+    &:after {
+      left: 7px;
+    }
+  }
+}
+
+
+.dropdown-item {
+  position: relative;
+  max-height: 37px;
+  background-color: #fff;
+  transition: box-shadow .1s ease-in-out,max-height .3s cubic-bezier(.25,.46,.45,.94);
+  overflow: hidden;
+  border: 1px solid #bcbcbc;  
+  color: #222;
+  border-radius: 2px;
+  &.active {
+    max-height: 395px;
+    border-color: #a2a2a2;
+    .dropdown-item__container:after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 18px;
+      opacity: .9;
+      background: linear-gradient(to top, rgba(255,255,255,1) 30%,rgba(255,255,255,0) 100%);
+      z-index: 30;
+      pointer-events: none;
+    }
+  }
+}
+
+.price-item + .price-item {
+  margin-top: 10px;
+}
+
+.dropdown-item__wrapper {
+  padding:0 12px 15px 12px;
+}
+
+.dropdown-item__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  padding: 7px 12px 0 12px;
+  width: 100%;
+  height: 37px;
+  cursor: pointer;
+  &:before {
+    @extend %dropdownicon;
+    .active & {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.dropdown-item__container {
+  position: relative;
+  z-index: 10;
+  padding-top: 37px;
+  width: 100%;
+  box-sizing: border-box;
+  
+  & > * {
+    max-height: 275px;
+    overflow-y: auto;
+    margin: 0;
+
+  }
+}
+
+.filter-wrapper-inner {
+  position: relative;
+  z-index: 30;
+
+  & > div {
+    margin-bottom: 10px;
+  }
+
+  @media screen and (min-width: 768px) {
+    height: 37px;
+    display: flex;
+    align-items: flex-start;
+    & > div {
+      width: 25%;
+    }
+    & > div + div {
+      margin-left: 15px;
+    }
+  }
+}
+
+.cl-schwarz,
+.cl-black {
+  label:before {
+    background: #000;
+  }
+} 
+
+.cl-braun,
+.cl-brown {
+  label:before {
+    background: #6f3e18;
+  }
+} 
+
+.cl-grau,
+.cl-grey {
+  label:before {
+    background: #838383;
+  }
+} 
+
+.cl-weiß,
+.cl-white {
+  label:before {
+    background: #fff;
+  }
+} 
+
+.cl-blau,
+.cl-blue {
+  label:before {
+    background: #0f73ad;
+  }  
+}
+
+.cl-petrol label:before {
+  background: #16738f;
+}
+
+.cl-türkis,
+.cl-turquoise {
+  label:before {
+    background: #39cbce;
+  }
+}
+
+.cl-grün,
+.cl-green {
+  label:before {
+    background: #5ad36c;
+  }
+}
+
+.cl-oliv,
+.cl-olive {
+  label:before {
+    background: #548b14;
+  }
+} 
+
+.cl-gelb,
+.cl-yellow {
+  label:before {
+    background: #fd3;
+  }
+} 
+
+.cl-orange label:before {
+  background: #fb863b;
+}
+
+.cl-rot,
+.cl-red {
+  label:before {
+    background: #ff0002;
+  }
+} 
+
+.cl-pink label:before {
+  background: #f563b9;
+}
+
+.cl-lila,
+.cl-purple {
+  label:before {
+    background: #9349aa;
+  }
+} 
+
+.cl-gold label:before {
+  background: linear-gradient(180deg,#eecd56,#fce2ac);
+}
+
+.cl-silber,
+.cl-silver {
+  label:before {
+    background: linear-gradient(180deg,#b0b0b0,#e0e0e0);
+  }
+} 
+
+.cl-mehrfarbig,
+.cl-multicolored {
+  label:before {
+    background-image: linear-gradient(50deg, transparent 50%, #0f73ad 0), linear-gradient(50deg, transparent 50%, #ff0002 0);
+  }
+}
+
+.sort-products {
+  @media screen and (min-width: 600px) {
+    float: right;
+  }
+  
+  display: flex;
+  font-size: 14px;
+  
+  p {
+    margin-bottom: 0;
+  }
+
+  div + div {
+    margin-left: 10px;
+  }
+
+  select,
+  p {
+    font-size: 15px;
+  } 
+  
+  p {
+    color: #8b8c8c;
+  }
+
+  select {
+    min-width: 140px;
+    position: relative; 
+    border: 0;
+    border-radius: 0;
+    background: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+  } 
+
+  select::-ms-expand {
+    display: none;
+  }
+}
+
+.select-wrapper {
+  position: relative;
+  
+  &:before {
+    @extend %dropdownicon;
+    top: 9px;
+    right: 2px;
+  }
+}
+
+.filter-bottom {
+  min-height: 30px;
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+
+.reset-filter {
+  @media screen and (min-width: 600px) {
+    float: left;
+  }
+  
+  button {
+    background: none;
+    border-radius: 0;
+    border: 1px solid #bcbcbc;
+    color: #222;
+    padding: 6px 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+
+    @media screen and (min-width: 600px) {
+      margin-bottom: 0;
+    }
+    &:hover {
+      background: #a2a2a2;
+      color: #fff;
+      border-color: #a2a2a2;
+    }
+  }
+}

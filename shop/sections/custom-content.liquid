@@ -1,0 +1,1325 @@
+<div class="page-width">
+  {% if section.settings.title != blank %}
+    <div class="section-header text-center">
+      <h4 class="h2">{{ section.settings.title | escape }}</h4>
+    </div>
+  {% endif %}
+
+  <div class="custom-content">
+    {% for block in section.blocks %}
+      {% case block.settings.width %}
+        {% when '25%' %}
+          {%- assign max_height = 250 -%}
+          {%- assign block_width = 'small--one-half medium-up--one-quarter' -%}
+        {% when '33%' %}
+          {%- assign max_height = 345 -%}
+          {%- assign block_width = 'small--one-half medium-up--one-third' -%}
+        {% when '50%' %}
+          {%- assign max_height = 530 -%}
+          {%- assign block_width = 'small--one-half medium-up--one-half' -%}
+        {% when '66%' %}
+          {%- assign max_height = 720 -%}
+          {%- assign block_width = 'two-thirds' -%}
+        {% when '75%' %}
+          {%- assign max_height = 810 -%}
+          {%- assign block_width = 'three-quarters' -%}
+        {% when '100%' %}
+          {%- assign max_height = 1090 -%}
+          {%- assign block_width = 'one-whole' -%}
+      {% endcase %}
+
+      {% if block.type == 'image' %}
+        {% capture img_id %}CustomImage--{{ forloop.index }}-{{ block.settings.image.id }}{% endcapture %}
+        {% capture img_wrapper_id %}CustomImageWrapper--{{ forloop.index }}-{{ block.settings.image.id }}{% endcapture %}
+
+        {% unless block.settings.image == blank %}
+          {% include 'image-style' with image: block.settings.image, small_style: false, width: max_height, height: max_height, wrapper_id: img_wrapper_id, img_id: img_id %}
+        {% endunless %}
+      {% endif %}
+
+      <div class="custom__item custom__item--{{block.id}} {{ block_width }} {% if block.settings.alignment %}align--{{ block.settings.alignment }}{% endif %}" {{ block.shopify_attributes }}>
+        <div class="custom__item-inner custom__item-inner--{{ block.type }}"{% if block.type == 'image' %} id="{{ img_wrapper_id }}"{% endif %}>
+          {% case block.type %}
+            {% when 'image' %}
+              {% if block.settings.image != blank %}
+                {%- assign img_url = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                <div style="padding-top:{{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100}}%;">
+                  <img id="{{ img_id }}"
+                       class="custom__image lazyload js"
+                       src="{{ block.settings.image | img_url: '300x300' }}"
+                       data-src="{{ img_url }}"
+                       data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                       data-aspectratio="{{ block.settings.image.aspect_ratio }}"
+                       data-sizes="auto"
+                       alt="{{ block.settings.image.alt | escape }}">
+                </div>
+                <noscript>
+                  {% capture image_size %}{{ max_height }}x{% endcapture %}
+                  {{ block.settings.image | img_url: image_size, scale: 2, crop: 'top' | img_tag: block.settings.image.alt, 'custom__image' }}
+                </noscript>
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            {% when 'text' %}
+              <div class="medium-up--text-{{ block.settings.align_text }}">
+                {% if block.settings.title != blank %}
+                  <h4 class="h3">{{ block.settings.title | escape }}</h4>
+                {% endif %}
+                {% if block.settings.text != blank %}
+                  <div class="rte-setting rte">{{ block.settings.text }}</div>
+                {% endif %}
+              </div>
+            {% when 'video' %}
+              <div class="video-wrapper">
+                {% if block.settings.video_url == blank %}
+                  <iframe src="//www.youtube.com/embed/_9VUPq3SxOc?rel=0&showinfo=0&vq=720" width="850" height="480" frameborder="0" allowfullscreen></iframe>
+                {% else %}
+                  {% if block.settings.video_url.type == "youtube" %}
+                    <iframe src="//www.youtube.com/embed/{{ block.settings.video_url.id }}?rel=0&showinfo=0&vq=720" width="850" height="480" frameborder="0" allowfullscreen></iframe>
+                  {% endif %}
+                  {% if block.settings.video_url.type == "vimeo" %}
+                    <iframe src="//player.vimeo.com/video/{{ block.settings.video_url.id }}?byline=0&portrait=0&badge=0" width="850" height="480" frameborder="0" allowfullscreen></iframe>
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% when 'product' %}
+              {%- assign product = all_products[block.settings.product] -%}
+              {% if product.title.size > 0 %}
+                {% include 'product-card-grid', max_height: max_height %}
+              {% else %}
+                {% comment %}
+                  No product yet. Show onboarding one.
+                {% endcomment %}
+                <div class="grid-view-item">
+                  <a class="grid-view-item__link" href="#">
+                    <div class="grid-view-item__image">
+                      {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                      {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                    <div class="h4 grid-view-item__title">{{ 'homepage.onboarding.product_title' | t }}</div>
+                    <div class="grid-view-item__meta">
+                      {{ 1999 | money }}
+                    </div>
+                  </a>
+                </div>
+              {% endif %}
+            {% when 'collection' %}
+              {%- assign collection = collections[block.settings.collection] -%}
+              {% include 'collection-grid-item' %}
+            {% when 'html' %}
+              {% if block.settings.code != blank %}
+                {{ block.settings.code }}
+              {% endif %}
+          {% endcase %}
+        </div>
+      </div>
+
+    {% endfor %}
+  </div>
+
+  {% if section.blocks.size == 0 %}
+    {% include 'no-blocks' %}
+  {% endif %}
+</div>
+
+
+
+{% schema %}
+{
+  "name": {
+    "de": "Personalisierter Content",
+    "en": "Custom content",
+    "es": "Contenido personalizado",
+    "fr": "Contenu personnalisé",
+    "it": "Contenuto personalizzato",
+    "ja": "コンテンツをカスタムする",
+    "pt-BR": "Conteúdo personalizado"
+  },
+  "class": "index-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": {
+        "de": "Titel",
+        "en": "Heading",
+        "es": "Título",
+        "fr": "En-tête",
+        "it": "Heading",
+        "ja": "見出し",
+        "pt-BR": "Título"
+      },
+      "default": {
+        "de": "Personalisierter Content",
+        "en": "Custom content",
+        "es": "Contenido personalizado",
+        "fr": "Contenu personnalisé",
+        "it": "Contenuto personalizzato",
+        "ja": "コンテンツをカスタムする",
+        "pt-BR": "Conteúdo personalizado"
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": {
+        "de": "Text",
+        "en": "Text",
+        "es": "Texto",
+        "fr": "Texte",
+        "it": "Testo",
+        "ja": "テキスト",
+        "pt-BR": "Texto"
+      },
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": {
+            "de": "Titel",
+            "en": "Heading",
+            "es": "Título",
+            "fr": "En-tête",
+            "it": "Heading",
+            "ja": "見出し",
+            "pt-BR": "Título"
+          },
+          "default": {
+            "de": "Erzählen Sie von Ihrer Marke",
+            "en": "Talk about your brand",
+            "es": "Habla de tu marca",
+            "fr": "Parlez de votre marque",
+            "it": "Parla del tuo brand",
+            "ja": "あなたのブランドについて語る",
+            "pt-BR": "Fale sobre a sua marca"
+          }
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": {
+            "de": "Text",
+            "en": "Text",
+            "es": "Texto",
+            "fr": "Texte",
+            "it": "Testo",
+            "ja": "テキスト",
+            "pt-BR": "Texto"
+          },
+          "default": {
+            "de": "<p>Nutzen Sie diesen Text, um Infos über Ihre Marke mitzuteilen. Beschreiben Sie ein Produkt, kündigen Sie etwas an oder heißen Sie Kunden willkommen.</p>",
+            "en": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
+            "es": "<p>Usa este texto para compartir información sobre tu marca con tus clientes. Describe un producto, comparte anuncios o recibe clientes en tu tienda.</p>",
+            "fr": "<p>Utilisez ce texte pour partager des informations sur votre marque. Décrivez un produit, partagez des annonces, ou souhaitez la bienvenue à vos clients.</p>",
+            "it": "<p>Utilizza questo testo per condividere le informazioni sul tuo brand con i tuoi clienti. Descrivi un prodotto, condividi gli annunci o dai il benvenuto ai clienti nel tuo negozio.</p>",
+            "ja": "<p>このテキストを使用して、あなたのブランドに関する情報をお客様と共有します。商品を説明したり、告知の共有をしたり、あるいはあなたのストアのお客様を歓迎します。</p>",
+            "pt-BR": "<p>Use este texto para compartilhar informações sobre sua marca com seus clientes. Descreva um produto, compartilhe anúncios ou receba os clientes em sua loja.</p>"
+          }
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": {
+            "de": "Breite des Elements",
+            "en": "Container width",
+            "es": "Ancho del contenedor",
+            "fr": "Largeur du conteneur",
+            "it": "Larghezza contenitore",
+            "ja": "コンテナーの幅",
+            "pt-BR": "Largura do recipiente"
+          },
+          "default": "50%",
+          "options": [
+            {
+              "value": "25%",
+              "label": {
+                "de": "25%",
+                "en": "25%",
+                "es": "25%",
+                "fr": "25 %",
+                "it": "25%",
+                "ja": "25%",
+                "pt-BR": "25%"
+              }
+            },
+            {
+              "value": "33%",
+              "label": {
+                "de": "33%",
+                "en": "33%",
+                "es": "33%",
+                "fr": "33 %",
+                "it": "33%",
+                "ja": "33%",
+                "pt-BR": "33%"
+              }
+            },
+            {
+              "value": "50%",
+              "label": {
+                "de": "50%",
+                "en": "50%",
+                "es": "50%",
+                "fr": "50 %",
+                "it": "50%",
+                "ja": "50%",
+                "pt-BR": "50%"
+              }
+            },
+            {
+              "value": "66%",
+              "label": {
+                "de": "66%",
+                "en": "66%",
+                "es": "66%",
+                "fr": "66 %",
+                "it": "66%",
+                "ja": "66%",
+                "pt-BR": "66%"
+              }
+            },
+            {
+              "value": "75%",
+              "label": {
+                "de": "75%",
+                "en": "75%",
+                "es": "75%",
+                "fr": "75 %",
+                "it": "75%",
+                "ja": "75%",
+                "pt-BR": "75%"
+              }
+            },
+            {
+              "value": "100%",
+              "label": {
+                "de": "100%",
+                "en": "100%",
+                "es": "100%",
+                "fr": "100 %",
+                "it": "100%",
+                "ja": "100%",
+                "pt-BR": "100%"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": {
+            "de": "Vertikale Ausrichtung",
+            "en": "Vertical alignment",
+            "es": "Alineación vertical",
+            "fr": "Alignement vertical",
+            "it": "Allineamento verticale",
+            "ja": "垂直アラインメント",
+            "pt-BR": "Alinhamento vertical"
+          },
+          "default": "center",
+          "options": [
+            {
+              "value": "top-middle",
+              "label": {
+                "de": "Oben",
+                "en": "Top",
+                "es": "Superior",
+                "fr": "Haut",
+                "it": "In alto",
+                "ja": "上",
+                "pt-BR": "Acima"
+              }
+            },
+            {
+              "value": "center",
+              "label": {
+                "de": "Mitte",
+                "en": "Middle",
+                "es": "Al medio",
+                "fr": "Milieu",
+                "it": "Al centro",
+                "ja": "中央",
+                "pt-BR": "Meio"
+              }
+            },
+            {
+              "value": "bottom-middle",
+              "label": {
+                "de": "Unten",
+                "en": "Bottom",
+                "es": "Inferior",
+                "fr": "Bas",
+                "it": "In basso",
+                "ja": "下",
+                "pt-BR": "Abaixo"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "align_text",
+          "label": {
+            "de": "Horizontale Ausrichtung",
+            "en": "Horizontal alignment",
+            "es": "Alineación horizontal",
+            "fr": "Alignement horizontal",
+            "it": "Allineamento orizzontale",
+            "ja": "水平アラインメント",
+            "pt-BR": "Alinhamento horizontal"
+          },
+          "default": "left",
+          "options": [
+            {
+              "value": "left",
+              "label": {
+                "de": "Links",
+                "en": "Left",
+                "es": "Izquierda",
+                "fr": "Gauche",
+                "it": "Sinistra",
+                "ja": "左",
+                "pt-BR": "Esquerda"
+              }
+            },
+            {
+              "value": "center",
+              "label": {
+                "de": "Mittig",
+                "en": "Centered",
+                "es": "Centrada",
+                "fr": "Centré",
+                "it": "Centrato",
+                "ja": "中央揃え",
+                "pt-BR": "Centralizado"
+              }
+            },
+            {
+              "value": "right",
+              "label": {
+                "de": "Rechts",
+                "en": "Right",
+                "es": "Derecha",
+                "fr": "Droite",
+                "it": "Destra",
+                "ja": "右",
+                "pt-BR": "Direita"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": {
+        "de": "Foto",
+        "en": "Image",
+        "es": "Imagen",
+        "fr": "Image",
+        "it": "Immagine",
+        "ja": "画像",
+        "pt-BR": "Imagem"
+      },
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": {
+            "de": "Foto",
+            "en": "Image",
+            "es": "Imagen",
+            "fr": "Image",
+            "it": "Immagine",
+            "ja": "画像",
+            "pt-BR": "Imagem"
+          }
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": {
+            "de": "Breite des Elements",
+            "en": "Container width",
+            "es": "Ancho del contenedor",
+            "fr": "Largeur du conteneur",
+            "it": "Larghezza contenitore",
+            "ja": "コンテナーの幅",
+            "pt-BR": "Largura do recipiente"
+          },
+          "default": "50%",
+          "options": [
+            {
+              "value": "25%",
+              "label": {
+                "de": "25%",
+                "en": "25%",
+                "es": "25%",
+                "fr": "25 %",
+                "it": "25%",
+                "ja": "25%",
+                "pt-BR": "25%"
+              }
+            },
+            {
+              "value": "33%",
+              "label": {
+                "de": "33%",
+                "en": "33%",
+                "es": "33%",
+                "fr": "33 %",
+                "it": "33%",
+                "ja": "33%",
+                "pt-BR": "33%"
+              }
+            },
+            {
+              "value": "50%",
+              "label": {
+                "de": "50%",
+                "en": "50%",
+                "es": "50%",
+                "fr": "50 %",
+                "it": "50%",
+                "ja": "50%",
+                "pt-BR": "50%"
+              }
+            },
+            {
+              "value": "66%",
+              "label": {
+                "de": "66%",
+                "en": "66%",
+                "es": "66%",
+                "fr": "66 %",
+                "it": "66%",
+                "ja": "66%",
+                "pt-BR": "66%"
+              }
+            },
+            {
+              "value": "75%",
+              "label": {
+                "de": "75%",
+                "en": "75%",
+                "es": "75%",
+                "fr": "75 %",
+                "it": "75%",
+                "ja": "75%",
+                "pt-BR": "75%"
+              }
+            },
+            {
+              "value": "100%",
+              "label": {
+                "de": "100%",
+                "en": "100%",
+                "es": "100%",
+                "fr": "100 %",
+                "it": "100%",
+                "ja": "100%",
+                "pt-BR": "100%"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": {
+            "de": "Vertikale Ausrichtung",
+            "en": "Vertical alignment",
+            "es": "Alineación vertical",
+            "fr": "Alignement vertical",
+            "it": "Allineamento verticale",
+            "ja": "垂直アラインメント",
+            "pt-BR": "Alinhamento vertical"
+          },
+          "default": "center",
+          "options": [
+            {
+              "value": "top-left",
+              "label": {
+                "de": "Oben links",
+                "en": "Top left",
+                "es": "Superior izquierda",
+                "fr": "En haut à gauche",
+                "it": "In alto a sinistra",
+                "ja": "左上",
+                "pt-BR": "Superior esquerdo"
+              }
+            },
+            {
+              "value": "top-middle",
+              "label": {
+                "de": "Oben mittig",
+                "en": "Top middle",
+                "es": "Superior al medio",
+                "fr": "En haut au centre",
+                "it": "Al centro in alto",
+                "ja": "中央上",
+                "pt-BR": "Centro da parte superior"
+              }
+            },
+            {
+              "value": "top-right",
+              "label": {
+                "de": "Oben rechts",
+                "en": "Top right",
+                "es": "Superior derecha",
+                "fr": "En haut à droite",
+                "it": "In alto a destra",
+                "ja": "右上",
+                "pt-BR": "Superior direito"
+              }
+            },
+            {
+              "value": "middle-left",
+              "label": {
+                "de": "Mitte links",
+                "en": "Middle left",
+                "es": "Al medio a la izquierda",
+                "fr": "Au milieu à gauche",
+                "it": "Nel mezzo a sinistra",
+                "ja": "中央左",
+                "pt-BR": "Meio esquerdo"
+              }
+            },
+            {
+              "value": "center",
+              "label": {
+                "de": "Mitte",
+                "en": "Middle",
+                "es": "Al medio",
+                "fr": "Milieu",
+                "it": "Al centro",
+                "ja": "中央",
+                "pt-BR": "Meio"
+              }
+            },
+            {
+              "value": "middle-right",
+              "label": {
+                "de": "Mitte rechts",
+                "en": "Middle right",
+                "es": "Al medio a la derecha",
+                "fr": "Au milieu à droite",
+                "it": "In centro a destra",
+                "ja": "中央右",
+                "pt-BR": "Meio direito"
+              }
+            },
+            {
+              "value": "bottom-left",
+              "label": {
+                "de": "Unten links",
+                "en": "Bottom left",
+                "es": "Inferior izquierda",
+                "fr": "En bas à gauche",
+                "it": "In basso a sinistra",
+                "ja": "左下",
+                "pt-BR": "Inferior esquerdo"
+              }
+            },
+            {
+              "value": "bottom-middle",
+              "label": {
+                "de": "Unten mittig",
+                "en": "Bottom middle",
+                "es": "Inferior al medio",
+                "fr": "En bas au centre",
+                "it": "Al centro in basso",
+                "ja": "中央下",
+                "pt-BR": "Centro da parte inferior"
+              }
+            },
+            {
+              "value": "bottom-right",
+              "label": {
+                "de": "Unten rechts",
+                "en": "Bottom right",
+                "es": "Inferior derecha",
+                "fr": "En bas à droite",
+                "it": "In basso a destra",
+                "ja": "右下",
+                "pt-BR": "Inferior direito"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": {
+        "de": "Video",
+        "en": "Video",
+        "es": "Video",
+        "fr": "Vidéo",
+        "it": "Video",
+        "ja": "ビデオ",
+        "pt-BR": "Vídeo"
+      },
+      "settings": [
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": {
+            "de": "YouTube oder Vimeo Link",
+            "en": "YouTube or Vimeo link",
+            "es": "Enlace de YouTube o Vimeo",
+            "fr": "Lien YouTube ou Vimeo",
+            "it": "Link YouTube o Vimeo",
+            "ja": "YouTubeまたはVimeoのリンク",
+            "pt-BR": "Link do YouTube ou do Vimeo"
+          },
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": {
+            "de": "Breite des Elements",
+            "en": "Container width",
+            "es": "Ancho del contenedor",
+            "fr": "Largeur du conteneur",
+            "it": "Larghezza contenitore",
+            "ja": "コンテナーの幅",
+            "pt-BR": "Largura do recipiente"
+          },
+          "default": "100%",
+          "options": [
+            {
+              "value": "25%",
+              "label": {
+                "de": "25%",
+                "en": "25%",
+                "es": "25%",
+                "fr": "25 %",
+                "it": "25%",
+                "ja": "25%",
+                "pt-BR": "25%"
+              }
+            },
+            {
+              "value": "33%",
+              "label": {
+                "de": "33%",
+                "en": "33%",
+                "es": "33%",
+                "fr": "33 %",
+                "it": "33%",
+                "ja": "33%",
+                "pt-BR": "33%"
+              }
+            },
+            {
+              "value": "50%",
+              "label": {
+                "de": "50%",
+                "en": "50%",
+                "es": "50%",
+                "fr": "50 %",
+                "it": "50%",
+                "ja": "50%",
+                "pt-BR": "50%"
+              }
+            },
+            {
+              "value": "66%",
+              "label": {
+                "de": "66%",
+                "en": "66%",
+                "es": "66%",
+                "fr": "66 %",
+                "it": "66%",
+                "ja": "66%",
+                "pt-BR": "66%"
+              }
+            },
+            {
+              "value": "75%",
+              "label": {
+                "de": "75%",
+                "en": "75%",
+                "es": "75%",
+                "fr": "75 %",
+                "it": "75%",
+                "ja": "75%",
+                "pt-BR": "75%"
+              }
+            },
+            {
+              "value": "100%",
+              "label": {
+                "de": "100%",
+                "en": "100%",
+                "es": "100%",
+                "fr": "100 %",
+                "it": "100%",
+                "ja": "100%",
+                "pt-BR": "100%"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": {
+            "de": "Vertikale Ausrichtung",
+            "en": "Vertical alignment",
+            "es": "Alineación vertical",
+            "fr": "Alignement vertical",
+            "it": "Allineamento verticale",
+            "ja": "垂直アラインメント",
+            "pt-BR": "Alinhamento vertical"
+          },
+          "default": "top-middle",
+          "options": [
+            {
+              "value": "top-middle",
+              "label": {
+                "de": "Oben",
+                "en": "Top",
+                "es": "Superior",
+                "fr": "Haut",
+                "it": "In alto",
+                "ja": "上",
+                "pt-BR": "Acima"
+              }
+            },
+            {
+              "value": "center",
+              "label": {
+                "de": "Mitte",
+                "en": "Middle",
+                "es": "Al medio",
+                "fr": "Milieu",
+                "it": "Centro",
+                "ja": "中央",
+                "pt-BR": "Meio"
+              }
+            },
+            {
+              "value": "bottom-middle",
+              "label": {
+                "de": "Unten",
+                "en": "Bottom",
+                "es": "Inferior",
+                "fr": "Bas",
+                "it": "In basso",
+                "ja": "下",
+                "pt-BR": "Abaixo"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": {
+        "de": "Produkt",
+        "en": "Product",
+        "es": "Producto",
+        "fr": "Produit",
+        "it": "Prodotto",
+        "ja": "商品",
+        "pt-BR": "Produto"
+      },
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": {
+            "de": "Produkt",
+            "en": "Product",
+            "es": "Producto",
+            "fr": "Produit",
+            "it": "Prodotto",
+            "ja": "商品",
+            "pt-BR": "Produto"
+          }
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": {
+            "de": "Breite des Elements",
+            "en": "Container width",
+            "es": "Ancho del contenedor",
+            "fr": "Largeur du conteneur",
+            "it": "Larghezza contenitore",
+            "ja": "コンテナーの幅",
+            "pt-BR": "Largura do recipiente"
+          },
+          "default": "50%",
+          "options": [
+            {
+              "value": "25%",
+              "label": {
+                "de": "25%",
+                "en": "25%",
+                "es": "25%",
+                "fr": "25 %",
+                "it": "25%",
+                "ja": "25%",
+                "pt-BR": "25%"
+              }
+            },
+            {
+              "value": "33%",
+              "label": {
+                "de": "33%",
+                "en": "33%",
+                "es": "33%",
+                "fr": "33 %",
+                "it": "33%",
+                "ja": "33%",
+                "pt-BR": "33%"
+              }
+            },
+            {
+              "value": "50%",
+              "label": {
+                "de": "50%",
+                "en": "50%",
+                "es": "50%",
+                "fr": "50 %",
+                "it": "50%",
+                "ja": "50%",
+                "pt-BR": "50%"
+              }
+            },
+            {
+              "value": "66%",
+              "label": {
+                "de": "66%",
+                "en": "66%",
+                "es": "66%",
+                "fr": "66 %",
+                "it": "66%",
+                "ja": "66%",
+                "pt-BR": "66%"
+              }
+            },
+            {
+              "value": "75%",
+              "label": {
+                "de": "75%",
+                "en": "75%",
+                "es": "75%",
+                "fr": "75 %",
+                "it": "75%",
+                "ja": "75%",
+                "pt-BR": "75%"
+              }
+            },
+            {
+              "value": "100%",
+              "label": {
+                "de": "100%",
+                "en": "100%",
+                "es": "100%",
+                "fr": "100 %",
+                "it": "100%",
+                "ja": "100%",
+                "pt-BR": "100%"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": {
+            "de": "Vertikale Ausrichtung",
+            "en": "Vertical alignment",
+            "es": "Alineación vertical",
+            "fr": "Alignement vertical",
+            "it": "Allineamento verticale",
+            "ja": "垂直アラインメント",
+            "pt-BR": "Alinhamento vertical"
+          },
+          "default": "center",
+          "options": [
+            {
+              "value": "top-left",
+              "label": {
+                "de": "Oben links",
+                "en": "Top left",
+                "es": "Superior izquierda",
+                "fr": "En haut à gauche",
+                "it": "In alto a sinistra",
+                "ja": "左上",
+                "pt-BR": "Superior esquerdo"
+              }
+            },
+            {
+              "value": "top-middle",
+              "label": {
+                "de": "Oben mittig",
+                "en": "Top middle",
+                "es": "Superior al medio",
+                "fr": "En haut au centre",
+                "it": "Al centro in alto",
+                "ja": "中央上",
+                "pt-BR": "Centro da parte superior"
+              }
+            },
+            {
+              "value": "top-right",
+              "label": {
+                "de": "Oben rechts",
+                "en": "Top right",
+                "es": "Superior derecha",
+                "fr": "En haut à droite",
+                "it": "In alto a destra",
+                "ja": "右上",
+                "pt-BR": "Superior direito"
+              }
+            },
+            {
+              "value": "middle-left",
+              "label": {
+                "de": "Mitte links",
+                "en": "Middle left",
+                "es": "Al medio a la izquierda",
+                "fr": "Au milieu à gauche",
+                "it": "In centro a sinistra",
+                "ja": "中央左",
+                "pt-BR": "Meio esquerdo"
+              }
+            },
+            {
+              "value": "center",
+              "label": {
+                "de": "Mitte",
+                "en": "Middle",
+                "es": "Al medio",
+                "fr": "Milieu",
+                "it": "Centro",
+                "ja": "中央",
+                "pt-BR": "Meio"
+              }
+            },
+            {
+              "value": "middle-right",
+              "label": {
+                "de": "Mitte rechts",
+                "en": "Middle right",
+                "es": "Al medio a la derecha",
+                "fr": "Au milieu à droite",
+                "it": "Nel mezzo a destra",
+                "ja": "中央右",
+                "pt-BR": "Meio direito"
+              }
+            },
+            {
+              "value": "bottom-left",
+              "label": {
+                "de": "Unten links",
+                "en": "Bottom left",
+                "es": "Inferior izquierda",
+                "fr": "En bas à gauche",
+                "it": "In basso a sinistra",
+                "ja": "左下",
+                "pt-BR": "Inferior esquerdo"
+              }
+            },
+            {
+              "value": "bottom-middle",
+              "label": {
+                "de": "Unten mittig",
+                "en": "Bottom middle",
+                "es": "Inferior al medio",
+                "fr": "En bas au centre",
+                "it": "Al centro in basso",
+                "ja": "中央下",
+                "pt-BR": "Centro da parte inferior"
+              }
+            },
+            {
+              "value": "bottom-right",
+              "label": {
+                "de": "Unten rechts",
+                "en": "Bottom right",
+                "es": "Inferior derecha",
+                "fr": "En bas à droite",
+                "it": "In basso a destra",
+                "ja": "右下",
+                "pt-BR": "Inferior direito"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "collection",
+      "name": {
+        "de": "Kategorie",
+        "en": "Collection",
+        "es": "Colección",
+        "fr": "Collection",
+        "it": "Collezione",
+        "ja": "コレクション",
+        "pt-BR": "Coleção"
+      },
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": {
+            "de": "Kategorie",
+            "en": "Collection",
+            "es": "Colección",
+            "fr": "Collection",
+            "it": "Collezione",
+            "ja": "コレクション",
+            "pt-BR": "Coleção"
+          }
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": {
+            "de": "Breite des Elements",
+            "en": "Container width",
+            "es": "Ancho del contenedor",
+            "fr": "Largeur du conteneur",
+            "it": "Larghezza contenitore",
+            "ja": "コンテナーの幅",
+            "pt-BR": "Largura do recipiente"
+          },
+          "default": "50%",
+          "options": [
+            {
+              "value": "25%",
+              "label": {
+                "de": "25%",
+                "en": "25%",
+                "es": "25%",
+                "fr": "25 %",
+                "it": "25%",
+                "ja": "25%",
+                "pt-BR": "25%"
+              }
+            },
+            {
+              "value": "33%",
+              "label": {
+                "de": "33%",
+                "en": "33%",
+                "es": "33%",
+                "fr": "33 %",
+                "it": "33%",
+                "ja": "33%",
+                "pt-BR": "33%"
+              }
+            },
+            {
+              "value": "50%",
+              "label": {
+                "de": "50%",
+                "en": "50%",
+                "es": "50%",
+                "fr": "50 %",
+                "it": "50%",
+                "ja": "50%",
+                "pt-BR": "50%"
+              }
+            },
+            {
+              "value": "66%",
+              "label": {
+                "de": "66%",
+                "en": "66%",
+                "es": "66%",
+                "fr": "66 %",
+                "it": "66%",
+                "ja": "66%",
+                "pt-BR": "66%"
+              }
+            },
+            {
+              "value": "75%",
+              "label": {
+                "de": "75%",
+                "en": "75%",
+                "es": "75%",
+                "fr": "75 %",
+                "it": "75%",
+                "ja": "75%",
+                "pt-BR": "75%"
+              }
+            },
+            {
+              "value": "100%",
+              "label": {
+                "de": "100%",
+                "en": "100%",
+                "es": "100%",
+                "fr": "100 %",
+                "it": "100%",
+                "ja": "100%",
+                "pt-BR": "100%"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "html",
+      "name": {
+        "de": "Personalisierte HTML",
+        "en": "Custom HTML",
+        "es": "HTML personalizado",
+        "fr": "HTML personnalisé",
+        "it": "HTML personalizzato",
+        "ja": "HTMLをカスタムする",
+        "pt-BR": "HTML personalizado"
+      },
+      "settings": [
+        {
+          "type": "html",
+          "id": "code",
+          "label": {
+            "de": "HTML",
+            "en": "HTML",
+            "es": "HTML",
+            "fr": "HTML",
+            "it": "HTML",
+            "ja": "HTML",
+            "pt-BR": "HTML"
+          }
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": {
+            "de": "Breite des Elements",
+            "en": "Container width",
+            "es": "Ancho del contenedor",
+            "fr": "Largeur du conteneur",
+            "it": "Larghezza contenitore",
+            "ja": "コンテナーの幅",
+            "pt-BR": "Largura do recipiente"
+          },
+          "default": "50%",
+          "options": [
+            {
+              "value": "25%",
+              "label": {
+                "de": "25%",
+                "en": "25%",
+                "es": "25%",
+                "fr": "25 %",
+                "it": "25%",
+                "ja": "25%",
+                "pt-BR": "25%"
+              }
+            },
+            {
+              "value": "33%",
+              "label": {
+                "de": "33%",
+                "en": "33%",
+                "es": "33%",
+                "fr": "33 %",
+                "it": "33%",
+                "ja": "33%",
+                "pt-BR": "33%"
+              }
+            },
+            {
+              "value": "50%",
+              "label": {
+                "de": "50%",
+                "en": "50%",
+                "es": "50%",
+                "fr": "50 %",
+                "it": "50%",
+                "ja": "50%",
+                "pt-BR": "50%"
+              }
+            },
+            {
+              "value": "66%",
+              "label": {
+                "de": "66%",
+                "en": "66%",
+                "es": "66%",
+                "fr": "66 %",
+                "it": "66%",
+                "ja": "66%",
+                "pt-BR": "66%"
+              }
+            },
+            {
+              "value": "75%",
+              "label": {
+                "de": "75%",
+                "en": "75%",
+                "es": "75%",
+                "fr": "75 %",
+                "it": "75%",
+                "ja": "75%",
+                "pt-BR": "75%"
+              }
+            },
+            {
+              "value": "100%",
+              "label": {
+                "de": "100%",
+                "en": "100%",
+                "es": "100%",
+                "fr": "100 %",
+                "it": "100%",
+                "ja": "100%",
+                "pt-BR": "100%"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": {
+        "de": "Personalisierter Content",
+        "en": "Custom content",
+        "es": "Contenido personalizado",
+        "fr": "Contenu personnalisé",
+        "it": "Contenuto personalizzato",
+        "ja": "コンテンツをカスタムする",
+        "pt-BR": "Conteúdo personalizado"
+      },
+      "category": {
+        "de": "Komplizierteres Layout",
+        "en": "Advanced layout",
+        "es": "Diseño avanzado",
+        "fr": "Mise en page avancée",
+        "it": "Layout avanzato",
+        "ja": "高度なレイアウト",
+        "pt-BR": "Layout avançado"
+      },
+      "blocks": [
+        {
+          "type": "text"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,79 @@
+[
+  {
+    "name": "vendor",
+    "dropdownText": "Marke",
+    "value": [],
+    "translate": {
+      "en": {
+        "Marke": "Brand"
+      }
+    }
+  },
+  {
+    "name": "color",
+    "dropdownText": "Farbe",
+    "value": [
+      "Schwarz",
+      "Braun",
+      "Grau",
+      "Weiß",
+      "Blau",
+      "Petrol", 
+      "Türkis",
+      "Grün",
+      "Oliv",
+      "Gelb",
+      "Orange",
+      "Rot",
+      "Pink",
+      "Lila",
+      "Gold",
+      "Silber",
+      "Mehrfarbig"
+    ],
+    "translate": {
+      "en": {
+        "Farbe": "Color",
+        "Schwarz": "Black",
+        "Braun": "Brown",
+        "Grau": "Grey" ,
+        "Weiß": "White",
+        "Blau": "Blue",
+        "Türkis": "Turquoise",
+        "Grün": "Green",
+        "Oliv": "Olive",
+        "Gelb": "Yellow",
+        "Rot": "Red",
+        "Lila": "Purple",
+        "Silber": "Silver",
+        "Mehrfarbig": "Multicolored"
+      }      
+    }
+  },
+  {
+    "name": "size",
+    "dropdownText": "Größe",
+    "value": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "translate": {
+      "en": {
+        "Größe": "Size"
+      }
+    }  
+  },
+  {
+    "name": "price",
+    "dropdownText": "Preis",
+    "value": [],
+    "translate": {
+      "en": {
+        "Preis": "Price"
+      }
+    }
+  }
+]
