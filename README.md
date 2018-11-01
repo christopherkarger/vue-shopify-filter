@@ -4,7 +4,7 @@ https://gulpjs.com/
 #Install themekit\
 https://shopify.github.io/themekit/
 
-#Adapt config\ 
+#Adapt config 
 shop/config.yml
 
 #run in terminal\
