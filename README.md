@@ -1,7 +1,5 @@
-#Install Gulp \n
+#Install Gulp\
 https://gulpjs.com/
-
-npm install
 
 #Install themekit
 https://shopify.github.io/themekit/
@@ -10,6 +8,7 @@ https://shopify.github.io/themekit/
 shop/config.yml
 
 #run in terminal
+npm install
 gulp
 cd shop
 theme --watch
