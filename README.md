@@ -11,7 +11,7 @@ shop/config.yml
 npm install\
 gulp\
 cd shop\
-theme --watch \
+theme --watch
 
 feel free to use or modify
 
