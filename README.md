@@ -1,5 +1,4 @@
-#Install
-Install gulp
+#Install Gulp \n
 https://gulpjs.com/
 
 npm install
