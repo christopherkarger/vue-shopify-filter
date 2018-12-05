@@ -16,7 +16,7 @@
             </div>
           </div>
           <div class="bottom-info">
-            <div class="title">{{ product.title }}</div>
+            <div class="title">{{ product.title | decodeURI }}</div>
             
             <div class="price-wrapper" :class="{onsale: salePercentage(product) > 0}">
               <div class="price" v-html="formatCurrency(product.variants[0].price)"></div>
@@ -103,6 +103,12 @@
           }
         }, 50);
       });
+    },
+
+    filters: {
+      decodeURI(data) {
+        return decodeURIComponent(data);
+      }
     }
 
   }

@@ -7,7 +7,7 @@
       </h4>
 
       <div class="filter-wrapper-inner">
-        <div class="dropdown-item size" :class="{active: showFilter.size}" v-if="filtersize.value.length > 1">
+        <div class="dropdown-item size" :class="{active: showFilter.size, selected: isFilterSelected(['size'])}" v-if="filtersize.value.length > 1">
           <div class="dropdown-item__header" @click="toggleFilter('size')">
             {{ filtersize.dropdownText }}
           </div>
@@ -24,7 +24,7 @@
 
         </div>
         
-        <div class="dropdown-item vendor" :class="{active: showFilter.vendor}" v-if="filtervendor.value.length > 1">
+        <div class="dropdown-item vendor" :class="{active: showFilter.vendor, selected: isFilterSelected(['vendor'])}" v-if="filtervendor.value.length > 1">
           <div class="dropdown-item__header" @click="toggleFilter('vendor')">
             {{ filtervendor.dropdownText }}
           </div>
@@ -32,14 +32,14 @@
             <ul>
               <li v-for="(value, index) in filtervendor.value" :key="index">
                 <input type="checkbox" :id="setID('vendor', index)" :value="value" v-model="checkboxesVendor"/>
-                <label :for="setID('vendor', index)" @click="handleFilter(index, 'vendor')">{{ value }}</label>
+                <label :for="setID('vendor', index)" @click="handleFilter(index, 'vendor')">{{ value | decodeURI }}</label>
               </li>
             </ul>
           </div>
           <save-close :readyToSave="readyToSave" @click.native="updateFilter"></save-close>
         </div>
 
-        <div class="dropdown-item price" :class="{active: showFilter.price}" v-if="filterprice.value.length > 0">
+        <div class="dropdown-item price" :class="{active: showFilter.price, selected: isFilterSelected(['price', 'sale', 'onlyavailable'])}" v-if="filterprice.value.length > 0">
           <div class="dropdown-item__header" @click="toggleFilter('price')">
             {{ filterprice.dropdownText }}
           </div>
@@ -53,12 +53,19 @@
                   <template v-if="language == 'en'">Only special offers</template>
                 </label>
               </div>
+               <div class="only-available">
+                <input type="checkbox" id="onlyavailable" v-model="checkboxAvailable"/>
+                <label for="onlyavailable" @click="handleFilter(true, 'onlyavailable')">
+                  <template v-if="language == 'de'">Nur verfügbare Produkte</template>
+                  <template v-if="language == 'en'">Only available products</template>
+                </label>
+              </div>
             </div>
           </div>
           <save-close :readyToSave="readyToSave" @click.native="updateFilter"></save-close>
         </div>
 
-        <div class="dropdown-item color" :class="{active: showFilter.color}" v-if="filtercolor.value.length > 1">
+        <div class="dropdown-item color" :class="{active: showFilter.color, selected: isFilterSelected(['color'])}" v-if="filtercolor.value.length > 1">
           <div class="dropdown-item__header" @click="toggleFilter('color')">
             {{ filtercolor.dropdownText }}
             </div>
@@ -144,6 +151,7 @@
         filterSelected,
         activeFilterString: null,
         initFilterString: null,
+        activeFilterCategories: [],
         showFilter: {
           size: false,
           vendor: false,
@@ -158,6 +166,7 @@
         checkboxesVendor: [],
         checkboxesColor: [],
         checkboxSale: null,
+         checkboxAvailable: null,
         resetPriceSlider: false
       }
     },
@@ -234,6 +243,7 @@
         this.checkboxesVendor = [];
         this.checkboxesColor = [];
         this.checkboxSale = false;
+        this.checkboxAvailable = false;
         this.resetPriceSlider = !this.resetPriceSlider;
         this.updateFilter();
       },
@@ -242,9 +252,21 @@
         if (this.hasFilterChanged()) {
           // add only selected filter
           const selectedFilter = {};
+          this.activeFilterCategories = [];
+          const filterItemPrice = this.$store.getters.filterItem('price').value;
+
           for (let key in this.filterSelected) {
             if (this.filterSelected[key].length > 0) {
               selectedFilter[key] = this.filterSelected[key];
+                            if (key == 'price') {
+                if ((filterItemPrice[0] !==  selectedFilter[key][0]) 
+                  || (filterItemPrice[1] !==  selectedFilter[key][1])) {
+                    this.activeFilterCategories.push(key);
+                }
+
+              } else {
+                this.activeFilterCategories.push(key);
+              }
             }
           }
 
@@ -267,6 +289,21 @@
         for (let filterName in this.showFilter) {
           this.showFilter[filterName] = false;
         }
+      },
+      
+      isFilterSelected(arr) {
+        const activeFilterCategories = this.activeFilterCategories;
+        let isActive = false;
+
+        if (activeFilterCategories.length > 0) {
+          arr.forEach((elm) => {
+            if (activeFilterCategories.indexOf(elm) > -1) {
+              isActive = true;
+            };
+          });
+        }
+      
+        return isActive;
       } 
     },
 
@@ -282,6 +319,12 @@
 
       isLoading() {
         return this.$store.getters.isLoading;
+      }
+    },
+
+    filters: {
+      decodeURI(data) {
+        return decodeURIComponent(data);
       }
     },
     

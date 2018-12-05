@@ -21,20 +21,6 @@
     },
     created() {
       this.$store.dispatch('getJSON');
-
-      setInterval(() => {
-        const oldCurrency = this.$store.getters.activeCurrency;
-        const decodedCookie = getCookie(globals().currencyCookieName);
-        
-        if (decodedCookie) {
-          const cookie = atob(decodedCookie);
-          if (cookie !== oldCurrency) { 
-            this.$store.dispatch('updateActiveCurrency', cookie);
-          }
-        }
-        
-      }, 800);
-
     }    
   }
 </script>

@@ -71,6 +71,8 @@
   
   .bottom-info {
     padding-top: 15px;
+    position: relative;
+    z-index: 10;
     .title {
       margin-bottom: 5px;  
     }

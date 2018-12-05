@@ -14,18 +14,22 @@ const mutations = {
       return newPrice;
     };
 
+    const replaceQuote = (str) => {
+      return str.replace('**quote**', "'");
+    };
+
     products.forEach((product,index)=> {
       const images = [];
       const variants = [];
 
-      let atLeastOneVariantAvailable = false;
-      product.variants.forEach((elm) => {
-        if (elm.available) {
-          atLeastOneVariantAvailable = true;
-        }
-      });
+      // let atLeastOneVariantAvailable = false;
+      // product.variants.forEach((elm) => {
+      //   if (elm.available) {
+      //     atLeastOneVariantAvailable = true;
+      //   }
+      // });
 
-      if (atLeastOneVariantAvailable) {
+      // if (atLeastOneVariantAvailable) {
 
         // Add images
         product.images.forEach((elm,index)=> {
@@ -37,7 +41,7 @@ const mutations = {
           const price = (elm.taxable) ? addCountryTax(elm.price) : elm.price;
           const compPrice = (elm.taxable) ? addCountryTax(elm.compare_at_price) : elm.compare_at_price;
           variants.push({
-            title: elm.title,
+            title: replaceQuote(elm.title),
             available: elm.available,
             price: beautifyNumber(price),
             compare_at_price: beautifyNumber(compPrice)
@@ -48,13 +52,14 @@ const mutations = {
         state.allProducts.push({
           published_at: product.published_at,
           handle: product.handle,
-          title: product.title,
-          vendor: product.vendor,
+          title: replaceQuote(product.title),
+          vendor: replaceQuote(product.vendor),
           images,
           tags: product.tags,
-          variants
+          variants,
+          index: product.index
         });
-      }
+     // }
     });
 
   },

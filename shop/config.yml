@@ -1,4 +1,4 @@
 development:
-  password: a9db3ffdd065bdbc7013a846010ee816
-  theme_id: "42010345542"
-  store: testmyfilter.myshopify.com
+  password: PASSWORD
+  theme_id: "ID"
+  store: STOREADRESS

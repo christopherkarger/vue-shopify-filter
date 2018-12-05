@@ -1,11 +1,21 @@
+{% paginate collection.products by 250 %}
 <div class="page-width container" id="content">
   <div class="collection-header">
     <h1 class="page-title">{{ collection.title }}</h1>
   </div>
  
   {% if collection.products_count > 0 %}
+  
+  <div id="products-json" data-sortedBy="{{ collection.default_sort_by }}">
+    <script>
+      var allProducts = '[ {% for product in collection.products %} { {% include 'product-block-json' %} } {% if forloop.last == false %},{% endif %}{% endfor %} ]';//products-json_end
+      window.allProducts = JSON.parse(allProducts);
+    </script>
+  </div>
+
   <div id="filter-wrapper" data-items="{{ collection.all_products_count }}">
     <div id="filter-app"></div>
   </div>
   {% endif %}
 </div>
+{% endpaginate %}

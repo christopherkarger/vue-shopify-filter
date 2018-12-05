@@ -1,4 +1,4 @@
-const sortArrayByName = (array, attribute) => {
+const sortArrayByItem = (array, attribute) => {
 
   array.sort((a, b) => {
   
@@ -22,6 +22,10 @@ const sortArrayByName = (array, attribute) => {
     if (attribute === 'alpha_za') {
       return  nameA < nameB ? 1 : -1;
     }
+    
+    if (attribute === 'highlight') {
+      return a.index - b.index;
+    }
 
     return  nameA > nameB ? 1 : -1;
     
@@ -36,8 +40,8 @@ const sortArrayBySale = (array) => {
     const productPriceB = parseFloat(b.variants[0].price);
     let comparePriceB = parseFloat(b.variants[0].compare_at_price);
     
-    if (!comparePriceA || isNaN(comparePriceA) || productPriceA == comparePriceA) { comparePriceA = 0; }
-    if (!comparePriceB || isNaN(comparePriceB) || productPriceB == comparePriceB) { comparePriceB = 0; }
+    if ((comparePriceA < productPriceA) || !comparePriceA || isNaN(comparePriceA) || productPriceA == comparePriceA) { comparePriceA = 0; }
+    if ((comparePriceB < productPriceB) || !comparePriceB || isNaN(comparePriceB) || productPriceB == comparePriceB) { comparePriceB = 0; }
     
     return  comparePriceB - comparePriceA;
 
@@ -84,18 +88,18 @@ export default (array, filter, attribute) => {
       array = sortArrayBySale(array);
     } else if (attribute == 'alpha_az' || attribute == 'alpha_za') {
       // Sort by alpha
-      array = sortArrayByName(array, attribute);
+      array = sortArrayByItem(array, attribute);
 
     } else if (attribute == 'price_up' || attribute == 'price_down') {
       array = sortArrayByPrice(array, attribute);
     } else if (attribute == 'new_down') {
-
       array = sortArrayBydate(array, attribute);
-
+    } else if (attribute == 'highlight') {
+      array = sortArrayByItem(array, attribute);
     } else {
       
       // Sort by name alphabetically
-      array = sortArrayByName(array);
+      array = sortArrayByItem(array);
             
     }
     

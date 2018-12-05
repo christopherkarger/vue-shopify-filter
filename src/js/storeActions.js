@@ -13,7 +13,7 @@ const actions = {
   getJSON: (context) => {
     context.dispatch('updateIsLoading', true);
     const promises = [];
-    const allProducts = [];
+    let allProducts = [];
     let filterJSON = null;
     let currencies = {};
     let shopifyError = false;
@@ -48,14 +48,24 @@ const actions = {
 
     const productsPages = globals(true).productsPages;
     if (productsPages) {
-      for (let i = 1; i <= productsPages; i++) {
-        const url = `${location.href}/products.json?limit=250&page=${i}`;
+      
+      // First page is on this page
+      allProducts = allProducts.concat(JSON.parse(JSON.stringify(window.allProducts)));
+
+      for (let i = 2; i <= productsPages; i++) {
+        const url = `${location.href}?page=${i}`;
         promises.push( 
-          axios.get(url)
-          .then(result => {
-            result.data.products.forEach((elm) => {
-              allProducts.push(elm);
-            });
+          axios.get(url).then(result => {
+            const data = result.data;
+            const startString = "var allProducts = '";
+            const endString = "';//products-json_end";
+            let pageProducts = data.substr(data.indexOf(startString) + startString.length);
+            
+            pageProducts = pageProducts.split(endString);
+            const parsedProducts = JSON.parse(pageProducts[0]);
+
+            allProducts = allProducts.concat(parsedProducts);
+
           })
           .catch(() => {
             shopifyError = true;
@@ -245,6 +255,12 @@ const actions = {
               }
             }
 
+          } else if (key == 'onlyavailable') {   
+            product.variants.forEach(element => {
+              if (element.available) { 
+                foundProduct = true;
+              } 
+            });
           } else {
             valueArray.forEach((elm) => {
               

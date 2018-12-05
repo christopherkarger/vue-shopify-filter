@@ -6,7 +6,6 @@ import { mutations } from './storeMutations';
 import globals from './global-variables';
 import getCookie from './modules/getCookie';
 
-
 Vue.use(Vuex);
 const cookieValue = getCookie(globals().currencyCookieName);
 const activeCurrency = (cookieValue) ? atob(cookieValue) : globals().standardCurrency;
@@ -19,7 +18,7 @@ export const store = new Vuex.Store({
     isLoading: false,
     filter: [],
     allProducts: [],
-    sortBy: 'sale',
+    sortBy: 'highlight',
     sorted: false,
     filteredProducts: {
       selected: false,
